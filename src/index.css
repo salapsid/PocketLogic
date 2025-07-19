@@ -10,6 +10,8 @@ body, html, #root {
   background: #222;
   color: #fff;
   padding: 10px;
+  display: flex;
+  flex-direction: column;
 }
 
 .sidebar .description {
@@ -48,4 +50,18 @@ body, html, #root {
   cursor: grab;
   user-select: none;
   margin-bottom: 5px;
+}
+
+.sidebar button {
+  margin-top: 5px;
+  padding: 6px 12px;
+  background: #555;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.sidebar button:hover {
+  background: #666;
 }

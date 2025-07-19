@@ -8,10 +8,11 @@ import ReactFlow, {
   useEdgesState
 } from 'reactflow';
 import LogicNode from './nodeTypes/LogicNode';
+import InputNode from './nodeTypes/InputNode';
 import { buildEquation } from './utils/generateEquation';
 
-const nodeTypes = { logic: LogicNode };
-const gateTypes = ['AND','OR','NAND','NOR','XOR','NOT'];
+const nodeTypes = { logic: LogicNode, input: InputNode };
+const gateTypes = ['AND','OR','NAND','NOR','XOR','NOT','INPUT'];
 
 function App() {
   const reactFlowWrapper = useRef(null);
@@ -20,6 +21,7 @@ function App() {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [eqn, setEqn] = useState('');
+  const idRef = useRef(0);
 
   const onConnect = useCallback(
     (params) => setEdges((eds) => addEdge(params, eds)),
@@ -36,21 +38,34 @@ function App() {
       event.preventDefault();
       if (!reactFlowInstance) return;
 
-      const label = event.dataTransfer.getData('application/reactflow');
-      if (!label) return;
+      const type = event.dataTransfer.getData('application/reactflow');
+      if (!type) return;
 
       const position = reactFlowInstance.project({
         x: event.clientX - reactFlowWrapper.current.getBoundingClientRect().left,
         y: event.clientY - reactFlowWrapper.current.getBoundingClientRect().top,
       });
-      const id = `${label}_${+new Date()}`;
 
-      const newNode = {
-        id,
-        type: 'logic',
-        position,
-        data: { label },
-      };
+      const id = `${type}_${Date.now()}_${idRef.current++}`;
+
+      let newNode;
+      if (type === 'INPUT') {
+        const name = window.prompt('Input name', 'A');
+        if (!name) return;
+        newNode = {
+          id,
+          type: 'input',
+          position,
+          data: { label: name },
+        };
+      } else {
+        newNode = {
+          id,
+          type: 'logic',
+          position,
+          data: { label: type },
+        };
+      }
 
       setNodes((nds) => nds.concat(newNode));
     },
@@ -64,6 +79,26 @@ function App() {
 
   const generate = () => {
     setEqn(buildEquation(nodes, edges));
+  };
+
+  const saveDesign = () => {
+    localStorage.setItem('design', JSON.stringify({ nodes, edges }));
+    alert('Design saved');
+  };
+
+  const loadDesign = () => {
+    const data = localStorage.getItem('design');
+    if (data) {
+      const { nodes: n, edges: e } = JSON.parse(data);
+      setNodes(n);
+      setEdges(e);
+    }
+  };
+
+  const clearDesign = () => {
+    setNodes([]);
+    setEdges([]);
+    setEqn('');
   };
 
   return (
@@ -83,6 +118,9 @@ function App() {
         ))}
         <div className="description">Then connect and click:</div>
         <button onClick={generate}>Generate Equation</button>
+        <button onClick={saveDesign}>Save</button>
+        <button onClick={loadDesign}>Load</button>
+        <button onClick={clearDesign}>Clear</button>
         <div style={{ marginTop: 20, fontSize: 14 }}>
           <strong>Equation:</strong>
           <div style={{ wordBreak: 'break-all' }}>{eqn}</div>
