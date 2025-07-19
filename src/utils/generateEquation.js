@@ -5,6 +5,9 @@ export function buildEquation(nodes, edges) {
   // recursive traversal
   function recurse(id) {
     const node = map[id];
+    if (node.type === 'input') {
+      return node.data.label;
+    }
     const inEdges = edges.filter(e => e.target === id);
     if (node.data.label === 'NOT') {
       const input = inEdges[0]?.source;
