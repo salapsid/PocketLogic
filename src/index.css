@@ -1,0 +1,40 @@
+body, html, #root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: sans-serif;
+}
+
+.sidebar {
+  width: 200px;
+  background: #222;
+  color: #fff;
+  padding: 10px;
+}
+
+.sidebar .description {
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.reactflow-wrapper {
+  flex: 1;
+  height: 100%;
+}
+
+.container {
+  display: flex;
+  height: 100%;
+}
+
+.button-bar {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 4;
+}
+
+.button-bar button {
+  margin-left: 8px;
+  padding: 6px 12px;
+}
